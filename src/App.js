@@ -1,25 +1,43 @@
-import logo from './logo.svg';
-import './App.css';
+import { useState } from "react";
 
-function App() {
+const PhotoGallery = () => {
+  const [photos, setPhotos] = useState([]);
+  const [search, setSearch] = useState("");
+
+  const handleFileUpload = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const title = prompt("Ingrese un título para la imagen:") || "Sin título";
+        setPhotos([...photos, { title, src: reader.result }]);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="gallery-container">
+      <input
+        type="text"
+        placeholder="Buscar por título..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        className="search-box"
+      />
+      <input type="file" accept="image/*" onChange={handleFileUpload} className="upload-button" />
+      <div className="photo-grid">
+        {photos
+          .filter((photo) => photo.title.toLowerCase().includes(search.toLowerCase()))
+          .map((photo, index) => (
+            <div key={index} className="photo-card">
+              <img src={photo.src} alt={photo.title} className="photo" />
+              <p>{photo.title}</p>
+            </div>
+          ))}
+      </div>
     </div>
   );
-}
+};
 
-export default App;
+export default PhotoGallery;
